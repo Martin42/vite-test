@@ -1,0 +1,8 @@
+[
+  { "name": "Apple", "category": "Fruit", "price": 1.5 },
+  { "name": "Carrot", "category": "Vegetable", "price": 0.5 },
+  { "name": "Orange", "category": "Fruit", "price": 2.0 },
+  { "name": "Cheese", "category": "Dairy", "price": 4.0 },
+  { "name": "Tomato", "category": "Vegetable", "price": 0.8 },
+  { "name": "Milk", "category": "Dairy", "price": 3.0 }
+]

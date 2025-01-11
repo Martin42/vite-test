@@ -1,58 +1,43 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import itemsJSON from "../items.json";
 
 export const Items = () => {
-  const [items, setItems] = useState(itemsJSON);
+  const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [sort, setSort] = useState("⌄");
 
-  // TODO: Merge both sort and search in the same function.
-  // The onChanges and onClick should be just to change the states
+  const filteredItems = useMemo(() => {
+    let result = itemsJSON;
+
+    if (categoryFilter) {
+      result = result.filter((item) => item.category === categoryFilter);
+    }
+
+    if (search) {
+      result = result.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (sort === "⌃") {
+      result = result.sort((a, b) => a.price - b.price);
+    } else {
+      result = result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [search, categoryFilter, sort]);
 
   const handleItemSearch = (e) => {
-    const searchValue = e.target.value;
-
-    if (categoryFilter !== "") {
-      const searchedItems = itemsJSON.filter(
-        (element) =>
-          element.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-          element.category === categoryFilter
-      );
-      setItems(searchedItems);
-    } else {
-      const searchedItems = itemsJSON.filter((element) =>
-        element.name.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setItems(searchedItems);
-    }
-    console.log(items);
+    setSearch(e.target.value);
   };
 
   const handleCategoryFilter = (e) => {
-    const filter = e.target.value;
-    setCategoryFilter(filter);
-    console.log(e.target.value);
-
-    if (filter === "") {
-      setItems(itemsJSON);
-    } else {
-      const filteredCategoryItems = items.filter(
-        (item) => item.category === filter
-      );
-      setItems(filteredCategoryItems);
-    }
+    setCategoryFilter(e.target.value);
   };
 
   const handleSort = () => {
-    if (sort === "⌃") {
-      setSort("⌄");
-      const sortedItems = items.sort((a, b) => b.price - a.price);
-      setItems(sortedItems);
-    } else {
-      setSort("⌃");
-      const sortedItems = items.sort((a, b) => a.price - b.price);
-      setItems(sortedItems);
-    }
+    setSort((prevSort) => (prevSort === "⌃" ? "⌄" : "⌃"));
   };
 
   const categoryDropdown = () => {
@@ -67,11 +52,6 @@ export const Items = () => {
       </option>
     ));
   };
-
-  useEffect(() => {
-    const sortedItems = itemsJSON.sort((a, b) => b.price - a.price);
-    setItems(sortedItems);
-  }, []);
 
   return (
     <div>
@@ -89,7 +69,7 @@ export const Items = () => {
           <th>Category</th>
           <th>Price</th>
         </tr>
-        {items.map((item, idx) => (
+        {filteredItems.map((item, idx) => (
           <tr key={idx}>
             <td>{item.name}</td>
             <td>{item.category}</td>
